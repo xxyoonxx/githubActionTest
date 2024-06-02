@@ -12,6 +12,6 @@ jobs:
       # market place에서 여러 uses 사용 가능
       # - uses: actions/checkout@v2
       - name: 파일 목록 출력
-        run: ls
+        run: ls -al
       - name: 파이썬 실행
         run: python test.py
