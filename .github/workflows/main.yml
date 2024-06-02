@@ -8,8 +8,8 @@ jobs:
     # 어디서 구동할지(Github가 관리하는 가상환경)
     runs-on: ubuntu-latest
     steps:
+      # 실행할 action을 설정
+      # market place에서 여러 uses 사용 가능
       - uses: actions/checkout@v2
       - name: 파이썬 실행
         run: python test.py
-      - name: 파일찾기
-        run: find / -name 'test.py'
