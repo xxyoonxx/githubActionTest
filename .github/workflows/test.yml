@@ -55,7 +55,7 @@ jobs:
         run: |
           new_image="${{ secrets.DOCKER_HUB_USERNAME }}/node-docker-test:latest"
           jq --arg IMAGE "$new_image" '.containerDefinitions[0].image = $IMAGE' task-definition.json > new-task-definition.json
-          mv new-task-definition.json task-definition.json
+          jq 'del(.taskDefinitionArn, .revision, .status, .requiresAttributes, .compatibilities, .registeredAt, .registeredBy)' new-task-definition.json > task-definition.json
 
       - name: Register new task definition
         id: register-task-def
