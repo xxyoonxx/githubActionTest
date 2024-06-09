@@ -44,11 +44,30 @@ jobs:
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: us-east-1
 
+      - name: Get current task definition
+        id: task-def
+        run: |
+          task_def_arn=$(aws ecs describe-services --services node-docker-test-service --cluster NodeDockerCluster --query 'services[0].taskDefinition' --output text)
+          aws ecs describe-task-definition --task-definition $task_def_arn --query 'taskDefinition' > task-definition.json
+
+      - name: Update task definition image
+        id: update-task-def
+        run: |
+          new_image="${{ secrets.DOCKER_HUB_USERNAME }}/node-docker-test:latest"
+          jq --arg IMAGE "$new_image" '.containerDefinitions[0].image = $IMAGE' task-definition.json > new-task-definition.json
+          mv new-task-definition.json task-definition.json
+
+      - name: Register new task definition
+        id: register-task-def
+        run: |
+          new_task_def_arn=$(aws ecs register-task-definition --cli-input-json file://task-definition.json --query 'taskDefinition.taskDefinitionArn' --output text)
+          echo "::set-output name=task-def-arn::$new_task_def_arn"
+
       - name: Deploy to ECS
         id: deploy-ecs
         uses: aws-actions/amazon-ecs-deploy-task-definition@v1
         with:
           cluster: NodeDockerCluster
           service: node-docker-test-service
-          task-definition: my-task.json
+          task-definition: ${{ steps.register-task-def.outputs['task-def-arn'] }}
           wait-for-service-stability: true
