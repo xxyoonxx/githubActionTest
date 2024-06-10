@@ -69,5 +69,5 @@ jobs:
         with:
           cluster: NodeDockerCluster
           service: node-docker-test-service
-          task-definition: my-task
+          task-definition: ${{ steps.register-task-def.outputs['task-def-arn'] }}
           wait-for-service-stability: true
