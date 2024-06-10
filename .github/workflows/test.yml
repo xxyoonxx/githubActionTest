@@ -48,6 +48,7 @@ jobs:
         id: task-def
         run: |
           task_def_arn=$(aws ecs describe-services --services node-docker-test-service --cluster NodeDockerCluster --query 'services[0].taskDefinition' --output text)
+          aws ecs describe-task-definition --task-definition $task_def_arn --query 'taskDefinition' > task-definition.json
           echo "::set-output name=task-def-arn::$task_def_arn"  # Output the ARN
 
       - name: Update task definition image
